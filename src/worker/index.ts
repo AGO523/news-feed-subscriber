@@ -39,7 +39,7 @@ app.get("/cron", async (c) => {
       topic: row.topic,
       optionalText:
         typeof row.optionalText === "string" ? row.optionalText : "",
-      repositoryName: row.repositoryName,
+      repositoryName: "news-feed-subscriber",
       prompt: formatedPrompt,
       createdAt: Date.now(),
     };
