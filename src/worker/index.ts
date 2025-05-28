@@ -6,24 +6,39 @@ type Bindings = {
   API_GATEWAY_KEY: string;
 };
 
+type NewsRow = {
+  id: number;
+  email: string;
+  topic: string;
+  optionalText: string | null;
+  prompt: string;
+};
+
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.get("/cron", async (c) => {
-  const db = c.env.DB;
-  const gatewayUrl = c.env.API_GATEWAY_URL;
-  const apiKey = c.env.API_GATEWAY_KEY;
+app.get("/", (c) => c.text("Scheduled task only."));
+
+app.get("/manual-test", async (c) => {
+  const result = await publishSubscribedNews(c.env);
+  return c.text(`Processed ${result.total} items.`);
+});
+
+async function publishSubscribedNews(
+  env: Bindings
+): Promise<{ total: number }> {
+  const db = env.DB;
+  const gatewayUrl = env.API_GATEWAY_URL;
+  const apiKey = env.API_GATEWAY_KEY;
 
   if (!gatewayUrl || !apiKey) {
-    return c.json(
-      { error: "API_GATEWAY_URLまたはAPI_GATEWAY_KEYが未設定です" },
-      500
-    );
+    console.error("API_GATEWAY_URLまたはAPI_GATEWAY_KEYが未設定です");
+    return { total: 0 };
   }
 
   const { results } = await db
     .prepare("SELECT * FROM news WHERE subscriptionStatus = ?")
     .bind("subscribed")
-    .all();
+    .all<NewsRow>();
 
   for (const row of results) {
     const rawPrompt = typeof row.prompt === "string" ? row.prompt : "";
@@ -37,8 +52,7 @@ app.get("/cron", async (c) => {
       uuid: crypto.randomUUID(),
       email: row.email,
       topic: row.topic,
-      optionalText:
-        typeof row.optionalText === "string" ? row.optionalText : "",
+      optionalText: row.optionalText || "",
       repositoryName: "news-feed-subscriber",
       prompt: formatedPrompt,
       createdAt: Date.now(),
@@ -71,7 +85,13 @@ app.get("/cron", async (c) => {
     }
   }
 
-  return c.json({ message: `${results.length} messages processed.` });
-});
+  return { total: results.length };
+}
 
-export default app;
+export default {
+  fetch: app.fetch,
+
+  async scheduled(env: Bindings) {
+    await publishSubscribedNews(env);
+  },
+};
