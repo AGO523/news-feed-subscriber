@@ -58,6 +58,8 @@ async function publishSubscribedNews(
       createdAt: Date.now(),
     };
 
+    console.log(`message:`, message);
+
     const encoded = encodeBase64Utf8(JSON.stringify(message));
 
     const payload = {
@@ -69,7 +71,7 @@ async function publishSubscribedNews(
     };
 
     try {
-      const res = await fetch(`${gatewayUrl}`, {
+      await fetch(`${gatewayUrl}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -78,8 +80,7 @@ async function publishSubscribedNews(
         body: JSON.stringify(payload),
       });
 
-      const text = await res.text();
-      console.log(`Sent message ${message.id}, response:`, text);
+      console.log(`Sent message ${message.id}`);
     } catch (e) {
       console.error(`Failed to send message ${message.id}`, e);
     }
