@@ -45,6 +45,8 @@ async function publishSubscribedNews(
 
   for (const row of results) {
     console.log(`Processing row:`, row);
+    console.log("row JSON:", JSON.stringify(row, null, 2));
+    console.log("keys:", Object.keys(row));
 
     const promptTemplate = `
 あなたは優秀なリサーチャーです。次の1と2のルールを絶対に遵守してください。
