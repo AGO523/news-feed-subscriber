@@ -23,6 +23,6 @@
     }
   ],
   "triggers": {
-    "crons": ["0 0 * * *"] // Every day at 9:00 AM JST
+    "crons": ["0 * * * *"] // Every hour
   }
 }
