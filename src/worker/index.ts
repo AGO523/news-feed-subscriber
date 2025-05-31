@@ -84,7 +84,7 @@ ${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
     };
 
     try {
-      await fetch(`${gatewayUrl}`, {
+      const res = await fetch(`${gatewayUrl}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,10 @@ ${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
         body: JSON.stringify(payload),
       });
 
-      console.log(`Sent message ${message.id}`);
+      const resText = await res.text();
+      console.log(
+        `Sent message ${message.id}, status: ${res.status}, body: ${resText}`
+      );
     } catch (e) {
       console.error(`Failed to send message ${message.id}`, e);
     }
