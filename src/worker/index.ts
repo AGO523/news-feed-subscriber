@@ -30,9 +30,6 @@ async function publishSubscribedNews(
   const gatewayUrl = env.API_GATEWAY_URL;
   const apiKey = env.API_GATEWAY_KEY;
 
-  console.log("API_GATEWAY_URL:", env.API_GATEWAY_URL);
-  console.log("API_GATEWAY_KEY:", env.API_GATEWAY_KEY);
-
   if (!gatewayUrl || !apiKey) {
     console.error("環境変数が設定されていません");
     return { total: 0 };
@@ -61,7 +58,7 @@ async function publishSubscribedNews(
       createdAt: Date.now(),
     };
 
-    const encoded = btoa(JSON.stringify(message));
+    const encoded = encodeBase64Utf8(JSON.stringify(message));
 
     const payload = {
       messages: [
@@ -89,6 +86,15 @@ async function publishSubscribedNews(
   }
 
   return { total: results.length };
+}
+
+function encodeBase64Utf8(str: string): string {
+  const uint8Array = new TextEncoder().encode(str);
+  let binary = "";
+  for (const byte of uint8Array) {
+    binary += String.fromCharCode(byte);
+  }
+  return btoa(binary);
 }
 
 export default {
