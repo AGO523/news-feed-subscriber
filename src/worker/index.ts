@@ -30,6 +30,9 @@ async function publishSubscribedNews(
   const gatewayUrl = env.API_GATEWAY_URL;
   const apiKey = env.API_GATEWAY_KEY;
 
+  console.log("API_GATEWAY_URL:", env.API_GATEWAY_URL);
+  console.log("API_GATEWAY_KEY:", env.API_GATEWAY_KEY);
+
   if (!gatewayUrl || !apiKey) {
     console.error("環境変数が設定されていません");
     return { total: 0 };
