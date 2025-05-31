@@ -6,16 +6,16 @@ type Bindings = {
   API_GATEWAY_KEY: string;
 };
 
-type NewsRow = {
-  id: number;
-  userId: number;
-  email: string;
-  topic: string;
-  optionalText: string | null;
-  progressStatus: string;
-  subscriptionStatus: string;
-  createdAt: number;
-};
+// type NewsRow = {
+//   id: number;
+//   userId: number;
+//   email: string;
+//   topic: string;
+//   optionalText: string | null;
+//   progressStatus: string;
+//   subscriptionStatus: string;
+//   createdAt: number;
+// };
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -41,7 +41,7 @@ async function publishSubscribedNews(
   const { results } = await db
     .prepare("SELECT * FROM news WHERE subscriptionStatus = ?")
     .bind("subscribed")
-    .all<NewsRow>();
+    .all();
 
   for (const row of results) {
     console.log(`Processing row:`, row);
