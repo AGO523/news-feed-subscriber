@@ -91,6 +91,13 @@ async function publishSubscribedNews(
   return { total: results.length };
 }
 
+app.get("/debug-env", (c) => {
+  return c.json({
+    API_GATEWAY_URL: c.env.API_GATEWAY_URL,
+    API_GATEWAY_KEY: c.env.API_GATEWAY_KEY,
+  });
+});
+
 export default {
   fetch: app.fetch,
 
