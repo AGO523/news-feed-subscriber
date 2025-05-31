@@ -98,6 +98,20 @@ app.get("/debug-env", (c) => {
   });
 });
 
+app.get("/debug-db", async (c) => {
+  try {
+    const { results } = await c.env.DB.prepare(
+      "SELECT * FROM news WHERE subscriptionStatus = ?"
+    )
+      .bind("subscribed")
+      .all();
+    return c.json({ count: results.length });
+  } catch (err) {
+    console.error("DB error", err);
+    return c.text("DB error", 500);
+  }
+});
+
 export default {
   fetch: app.fetch,
 
