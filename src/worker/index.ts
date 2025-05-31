@@ -40,7 +40,10 @@ async function publishSubscribedNews(
     .bind("subscribed")
     .all<NewsRow>();
 
+  console.log(`Found ${results.length} subscribed news items.`);
+
   for (const row of results) {
+    console.log(`Processing row:`, row);
     const rawPrompt = typeof row.prompt === "string" ? row.prompt : "";
     const formatedPrompt = rawPrompt.replace(
       "あなたは優秀なリサーチャーです。",
