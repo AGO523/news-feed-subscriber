@@ -8,10 +8,13 @@ type Bindings = {
 
 type NewsRow = {
   id: number;
+  userId: number;
   email: string;
   topic: string;
   optionalText: string | null;
-  prompt: string;
+  progressStatus: string;
+  subscriptionStatus: string;
+  createdAt: number;
 };
 
 const app = new Hono<{ Bindings: Bindings }>();
@@ -40,15 +43,20 @@ async function publishSubscribedNews(
     .bind("subscribed")
     .all<NewsRow>();
 
-  console.log(`Found ${results.length} subscribed news items.`);
-
   for (const row of results) {
     console.log(`Processing row:`, row);
-    const rawPrompt = typeof row.prompt === "string" ? row.prompt : "";
-    const formatedPrompt = rawPrompt.replace(
-      "あなたは優秀なリサーチャーです。",
-      "あなたは優秀なリサーチャーです。次の1と2のルールを絶対に遵守してください。1: 結果には要約文とニュースソースだけを記載してください。2: メールで文章を表示することを前提として、読みやすい結果にしてください。"
-    );
+
+    const promptTemplate = `
+あなたは優秀なリサーチャーです。次の1と2のルールを絶対に遵守してください。
+1: 結果には要約文とニュースソースだけを記載してください。
+2: メールで文章を表示することを前提として、読みやすい結果にしてください。
+
+私は「${row.topic}」について、最新の情報をキャッチアップしたいと考えています。
+現在の日時を取得して、「${
+      row.topic
+    }」について、信頼性の高いニュースソースを3件検索して要約してください。
+それぞれのニュースについて簡潔な要約と参照URLを必ず記載してください。
+${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
 
     const message = {
       id: row.id,
@@ -57,7 +65,7 @@ async function publishSubscribedNews(
       topic: row.topic,
       optionalText: row.optionalText || "",
       repositoryName: "news-feed-subscriber",
-      prompt: formatedPrompt,
+      prompt: promptTemplate,
       createdAt: Date.now(),
     };
 
