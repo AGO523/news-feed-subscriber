@@ -72,7 +72,7 @@ async function publishSubscribedNews(
     };
 
     try {
-      const res = await fetch(`${gatewayUrl}/publish`, {
+      const res = await fetch(`${gatewayUrl}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -90,27 +90,6 @@ async function publishSubscribedNews(
 
   return { total: results.length };
 }
-
-app.get("/debug-env", (c) => {
-  return c.json({
-    API_GATEWAY_URL: c.env.API_GATEWAY_URL,
-    API_GATEWAY_KEY: c.env.API_GATEWAY_KEY,
-  });
-});
-
-app.get("/debug-db", async (c) => {
-  try {
-    const { results } = await c.env.DB.prepare(
-      "SELECT * FROM news WHERE subscriptionStatus = ?"
-    )
-      .bind("subscribed")
-      .all();
-    return c.json({ count: results.length });
-  } catch (err) {
-    console.error("DB error", err);
-    return c.text("DB error", 500);
-  }
-});
 
 export default {
   fetch: app.fetch,
