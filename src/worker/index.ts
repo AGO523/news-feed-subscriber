@@ -79,6 +79,8 @@ ${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
       ],
     };
 
+    console.log("gatewayUrl:", gatewayUrl);
+
     try {
       const res = await fetch(`${gatewayUrl}/publish`, {
         method: "POST",
