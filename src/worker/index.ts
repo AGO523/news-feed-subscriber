@@ -6,16 +6,16 @@ type Bindings = {
   API_GATEWAY_KEY: string;
 };
 
-// type NewsRow = {
-//   id: number;
-//   userId: number;
-//   email: string;
-//   topic: string;
-//   optionalText: string | null;
-//   progressStatus: string;
-//   subscriptionStatus: string;
-//   createdAt: number;
-// };
+type News = {
+  id: number;
+  userId: number;
+  email: string;
+  topic: string;
+  optionalText: string | null;
+  progressStatus: string;
+  subscriptionStatus: string;
+  createdAt: number;
+};
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -41,12 +41,10 @@ async function publishSubscribedNews(
   const { results } = await db
     .prepare("SELECT * FROM news WHERE subscriptionStatus = ?")
     .bind("subscribed")
-    .all();
+    .all<News>();
 
   for (const row of results) {
-    console.log(`Processing row:`, row);
     console.log("row JSON:", JSON.stringify(row, null, 2));
-    console.log("keys:", Object.keys(row));
 
     const promptTemplate = `
 あなたは優秀なリサーチャーです。次の1と2のルールを絶対に遵守してください。
@@ -71,8 +69,6 @@ ${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
       createdAt: Date.now(),
     };
 
-    console.log(`message:`, message);
-
     const encoded = encodeBase64Utf8(JSON.stringify(message));
 
     const payload = {
@@ -84,7 +80,7 @@ ${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
     };
 
     try {
-      const res = await fetch(`${gatewayUrl}`, {
+      const res = await fetch(`${gatewayUrl}/publish`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
