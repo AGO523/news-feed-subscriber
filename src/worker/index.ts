@@ -113,7 +113,12 @@ function encodeBase64Utf8(str: string): string {
 export default {
   fetch: app.fetch,
 
-  async scheduled(env: Bindings) {
+  async scheduled(
+    _controller: ScheduledController,
+    env: Bindings,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _ctx: ExecutionContext
+  ) {
     await publishSubscribedNews(env);
   },
 };
