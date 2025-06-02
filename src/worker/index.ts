@@ -47,16 +47,12 @@ async function publishSubscribedNews(
     console.log("row JSON:", JSON.stringify(row, null, 2));
 
     const promptTemplate = `
-あなたは優秀なリサーチャーです。次の1と2のルールを絶対に遵守してください。
-1: 結果には要約文とニュースソースだけを記載してください。
-2: メールで文章を表示することを前提として、読みやすい結果にしてください。
-
-私は「${row.topic}」について、最新の情報をキャッチアップしたいと考えています。
-現在の日時を取得して、「${
-      row.topic
-    }」について、信頼性の高いニュースソースを3件検索して要約してください。
-それぞれのニュースについて簡潔な要約と参照URLを必ず記載してください。
-${row.optionalText ? `補足: ${row.optionalText}` : ""}`.trim();
+あなたは優秀なリサーチャーであり、指導者です。
+私は毎日、「${row.topic}」について、学習をしたいと考えています。
+「${row.topic}」について、信頼性の高い情報を調査して、内容を要約してください。
+結果には要約文と情報のソースを記載してください。
+${row.optionalText ? `補足: ${row.optionalText}` : ""}
+メールで文章を表示することを前提として、シンプルで読みやすい結果にしてください。`.trim();
 
     const message = {
       id: row.id,
